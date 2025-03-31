@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1742903118081" clover="3.2.0">
+  <project timestamp="1742903118081" name="All files">
+    <metrics statements="95" coveredstatements="86" conditionals="37" coveredconditionals="30" methods="30" coveredmethods="22" elements="162" coveredelements="138" complexity="0" loc="95" ncloc="95" packages="2" files="2" classes="2"/>
+    <package name="pages">
+      <metrics statements="83" coveredstatements="75" conditionals="31" coveredconditionals="25" methods="27" coveredmethods="19"/>
+      <file name="Calendar.jsx" path="C:\Users\schio\WebstormProjects\untitled\src\pages\Calendar.jsx">
+        <metrics statements="83" coveredstatements="75" conditionals="31" coveredconditionals="25" methods="27" coveredmethods="19"/>
+        <line num="9" count="71" type="stmt"/>
+        <line num="193" count="71" type="stmt"/>
+        <line num="196" count="71" type="stmt"/>
+        <line num="206" count="71" type="stmt"/>
+        <line num="207" count="71" type="stmt"/>
+        <line num="210" count="71" type="stmt"/>
+        <line num="213" count="71" type="stmt"/>
+        <line num="216" count="71" type="stmt"/>
+        <line num="219" count="71" type="stmt"/>
+        <line num="222" count="71" type="stmt"/>
+        <line num="223" count="71" type="stmt"/>
+        <line num="225" count="71" type="stmt"/>
+        <line num="226" count="10" type="stmt"/>
+        <line num="230" count="71" type="stmt"/>
+        <line num="231" count="4" type="stmt"/>
+        <line num="232" count="4" type="stmt"/>
+        <line num="233" count="4" type="stmt"/>
+        <line num="244" count="71" type="stmt"/>
+        <line num="245" count="1" type="stmt"/>
+        <line num="246" count="1" type="stmt"/>
+        <line num="247" count="1" type="stmt"/>
+        <line num="248" count="1" type="stmt"/>
+        <line num="252" count="71" type="stmt"/>
+        <line num="253" count="3" type="stmt"/>
+        <line num="254" count="3" type="stmt"/>
+        <line num="255" count="3" type="stmt"/>
+        <line num="256" count="3" type="stmt"/>
+        <line num="267" count="71" type="stmt"/>
+        <line num="268" count="43" type="stmt"/>
+        <line num="269" count="43" type="stmt"/>
+        <line num="276" count="71" type="stmt"/>
+        <line num="278" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="286" count="1" type="stmt"/>
+        <line num="287" count="1" type="stmt"/>
+        <line num="291" count="3" type="stmt"/>
+        <line num="292" count="3" type="stmt"/>
+        <line num="294" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="295" count="1" type="stmt"/>
+        <line num="296" count="1" type="stmt"/>
+        <line num="299" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="301" count="1" type="stmt"/>
+        <line num="302" count="20" type="cond" truecount="2" falsecount="0"/>
+        <line num="304" count="1" type="stmt"/>
+        <line num="307" count="1" type="stmt"/>
+        <line num="311" count="1" type="stmt"/>
+        <line num="315" count="2" type="stmt"/>
+        <line num="318" count="71" type="stmt"/>
+        <line num="319" count="20" type="stmt"/>
+        <line num="320" count="1" type="stmt"/>
+        <line num="323" count="71" type="stmt"/>
+        <line num="324" count="6" type="stmt"/>
+        <line num="325" count="6" type="stmt"/>
+        <line num="328" count="71" type="stmt"/>
+        <line num="329" count="1419" type="stmt"/>
+        <line num="330" count="1419" type="cond" truecount="1" falsecount="1"/>
+        <line num="331" count="1419" type="cond" truecount="1" falsecount="1"/>
+        <line num="332" count="1419" type="cond" truecount="3" falsecount="0"/>
+        <line num="335" count="71" type="stmt"/>
+        <line num="336" count="3731" type="cond" truecount="1" falsecount="1"/>
+        <line num="337" count="0" type="stmt"/>
+        <line num="338" count="3731" type="cond" truecount="1" falsecount="1"/>
+        <line num="339" count="3731" type="stmt"/>
+        <line num="340" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="341" count="0" type="stmt"/>
+        <line num="343" count="0" type="stmt"/>
+        <line num="347" count="71" type="stmt"/>
+        <line num="348" count="71" type="stmt"/>
+        <line num="349" count="71" type="stmt"/>
+        <line num="350" count="71" type="stmt"/>
+        <line num="353" count="71" type="stmt"/>
+        <line num="354" count="71" type="stmt"/>
+        <line num="355" count="71" type="stmt"/>
+        <line num="358" count="71" type="stmt"/>
+        <line num="359" count="0" type="stmt"/>
+        <line num="362" count="71" type="stmt"/>
+        <line num="368" count="1" type="stmt"/>
+        <line num="371" count="0" type="stmt"/>
+        <line num="372" count="0" type="stmt"/>
+        <line num="374" count="0" type="stmt"/>
+        <line num="392" count="347" type="stmt"/>
+        <line num="428" count="277" type="stmt"/>
+        <line num="429" count="277" type="stmt"/>
+        <line num="431" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="utils">
+      <metrics statements="12" coveredstatements="11" conditionals="6" coveredconditionals="5" methods="3" coveredmethods="3"/>
+      <file name="sortEvents.js" path="C:\Users\schio\WebstormProjects\untitled\src\utils\sortEvents.js">
+        <metrics statements="12" coveredstatements="11" conditionals="6" coveredconditionals="5" methods="3" coveredmethods="3"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="3" type="stmt"/>
+        <line num="3" count="10" type="cond" truecount="2" falsecount="0"/>
+        <line num="4" count="3" type="stmt"/>
+        <line num="5" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="6" count="3" type="stmt"/>
+        <line num="7" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="8" count="4" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="15" count="8" type="stmt"/>
+        <line num="16" count="8" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
