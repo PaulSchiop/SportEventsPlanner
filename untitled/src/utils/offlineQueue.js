@@ -43,7 +43,7 @@ class OfflineQueue {
                     type === 'UPDATE' ? 'PUT' :
                         type === 'DELETE' ? 'DELETE' : 'GET',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: type !== 'DELETE' ? JSON.stringify(data) : undefined
             });
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -53,7 +53,7 @@ class OfflineQueue {
                 const createdItem = await response.json();
                 const localEvents = JSON.parse(localStorage.getItem('events')) || [];
                 const updatedEvents = localEvents.map(item =>
-                    item.id === tempId ? { ...item, id: createdItem.ID, _isQueued: false } : item
+                    item.ID === tempId ? { ...item, ID: createdItem.ID, _isQueued: false } : item
                 );
                 localStorage.setItem('events', JSON.stringify(updatedEvents));
             }

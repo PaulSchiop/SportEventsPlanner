@@ -1,7 +1,20 @@
 import {networkStatus} from "../utils/networkStatus.js";
 import {offlineQueue} from "../utils/offlineQueue.js";
 
-const API_URL = "http://localhost:5000/entities";
+const SERVER_IP = "10.220.10.194";
+const SERVER_PORT = 5000;
+
+const getApiUrl = () => {
+    // When running locally on the development machine
+    if (window.location.hostname === 'localhost') {
+        return "http://localhost:5000/entities";
+    }
+
+    // When accessed from another device like the VM
+    return `http://${window.location.hostname}:5000/entities`;
+};
+
+const API_URL = getApiUrl();
 
 // Get all events with optional filtering and sorting
 export const getEvents = async (page = 1, limit = 10, filters = {}) => {
@@ -17,17 +30,33 @@ export const getEvents = async (page = 1, limit = 10, filters = {}) => {
         return {
             data: filtered.slice(start, end),
             metadata: {
-                hasNextPage: end < filtered.length
+                hasNextPage: end < filtered.length,
+                totalItems: filtered.length,
+                currentPage: page,
+                totalPages: Math.ceil(filtered.length / limit),
+                hasPreviousPage: page > 1,
+                limit
             }
         };
     }
 
     try {
-        const query = new URLSearchParams({
-            ...filters,
+        // Fix query parameters to match backend expectations
+        const queryParams = {
             page,
             limit
-        }).toString();
+        };
+
+        // Add filters based on what the backend expects
+        if (filters.searchTerm) queryParams.title = filters.searchTerm;
+        if (filters.month && filters.year) {
+            // Create date filter in YYYY-MM format that backend can use
+            const month = filters.month.padStart(2, '0');
+            queryParams.date = `${filters.year}-${month}`;
+        }
+        if (filters.sortBy) queryParams.sortBy = filters.sortBy;
+
+        const query = new URLSearchParams(queryParams).toString();
 
         console.log(`Making API request to: ${API_URL}?${query}`);
         const response = await fetch(`${API_URL}?${query}`);
@@ -39,16 +68,31 @@ export const getEvents = async (page = 1, limit = 10, filters = {}) => {
         const result = await response.json();
         console.log("API response:", result);
 
-        // Update local storage
+        // Keep local storage updated with all fetched events, but don't overwrite
+        // existing ones that might contain temporary offline changes
         const existingEvents = JSON.parse(localStorage.getItem('events')) || [];
-        const newEvents = result.data.filter(newEvent =>
-            !existingEvents.some(existingEvent => existingEvent.ID === newEvent.ID)
-        );
-        localStorage.setItem('events', JSON.stringify([...existingEvents, ...newEvents]));
+
+        // Merge new events with existing events, preferring local events with _isQueued flag
+        const mergedEvents = [...existingEvents];
+
+        result.data.forEach(serverEvent => {
+            const localIndex = mergedEvents.findIndex(e => e.ID === serverEvent.ID);
+            if (localIndex === -1) {
+                // Add new event from server
+                mergedEvents.push(serverEvent);
+            } else if (!mergedEvents[localIndex]._isQueued) {
+                // Update existing event if it's not in the queue waiting to be synced
+                mergedEvents[localIndex] = serverEvent;
+            }
+            // Leave queued events untouched
+        });
+
+        localStorage.setItem('events', JSON.stringify(mergedEvents));
 
         return result;
     } catch (error) {
         console.error('Failed to fetch events:', error);
+        // Fall back to local events in case of error
         const localEvents = JSON.parse(localStorage.getItem('events')) || [];
         const filtered = filterEvents(localEvents, filters);
         const start = (page - 1) * limit;
@@ -56,7 +100,12 @@ export const getEvents = async (page = 1, limit = 10, filters = {}) => {
         return {
             data: filtered.slice(start, end),
             metadata: {
-                hasNextPage: end < filtered.length
+                hasNextPage: end < filtered.length,
+                totalItems: filtered.length,
+                currentPage: page,
+                totalPages: Math.ceil(filtered.length / limit),
+                hasPreviousPage: page > 1,
+                limit
             }
         };
     }
@@ -193,9 +242,27 @@ export const deleteEvent = async (id) => {
 
 const filterEvents = (events, filters) => {
     return events.filter(event => {
-        return Object.entries(filters).every(([key, value]) => {
-            if (!value) return true;
-            return event[key]?.toString().toLowerCase().includes(value.toLowerCase());
-        });
+        // Filter by search term (title)
+        if (filters.searchTerm && !event.title.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
+            return false;
+        }
+
+        // Filter by month
+        if (filters.month) {
+            const eventMonth = new Date(event.date).getMonth() + 1;
+            if (eventMonth !== parseInt(filters.month)) {
+                return false;
+            }
+        }
+
+        // Filter by year
+        if (filters.year) {
+            const eventYear = new Date(event.date).getFullYear();
+            if (eventYear !== parseInt(filters.year)) {
+                return false;
+            }
+        }
+
+        return true;
     });
 };

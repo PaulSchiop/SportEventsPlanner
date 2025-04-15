@@ -6,6 +6,7 @@ import '../styles/Calendar.css';
 import { getEvents, createEvent, updateEvent, deleteEvent } from "../services/apiService.jsx";
 import NetworkStatusBar from "../components/NetworkStatusBar.jsx";
 import {networkStatus} from "../utils/networkStatus.js";
+import {offlineQueue} from "../utils/offlineQueue.js";
 
 function Calendar() {
     const [sportsEvents, setSportsEvents] = useState([]);
@@ -126,6 +127,7 @@ function Calendar() {
     useEffect(() => {
         console.log("Filters changed, resetting page");
         setSportsEvents([]);
+        setLocalEvents([]);  // Reset local events too
         setPage(1);
         setHasMore(true);
         fetchInitialEvents();
@@ -305,51 +307,41 @@ function Calendar() {
 
     // Sync with server when connection restored
     useEffect(() => {
-        const handleSyncComplete = (status) => {
+        const handleSyncComplete = async (status) => {
             if (status.isOnline && status.isServerAvailable) {
-                console.log("Network restored, refreshing current events without reset");
+                console.log("Network restored, refreshing events");
+                saveScrollPosition();
 
-                // Instead of resetting everything, just reload the current pages
-                const currentPage = page;
+                // Process offline queue first
+                await offlineQueue.processQueue();
+
+                // Then reload current view without resetting page
                 setLoading(true);
-
-                // Create an array of promises for each page we've loaded so far
-                const pagePromises = [];
-                for (let i = 1; i <= currentPage; i++) {
-                    pagePromises.push(getEvents(i, eventsPerPage));
-                }
-
-                // Load all pages we've previously viewed
-                Promise.all(pagePromises)
-                    .then(results => {
-                        // Flatten the results array and remove duplicates
-                        const allEvents = [];
-                        results.forEach(pageData => {
-                            if (Array.isArray(pageData)) {
-                                pageData.forEach(event => {
-                                    if (!allEvents.some(e => e.ID === event.ID)) {
-                                        allEvents.push(event);
-                                    }
-                                });
-                            }
-                        });
-
-                        // Update with all events without changing page number
-                        setSportsEvents(allEvents);
-                        setLocalEvents(allEvents);
-                    })
-                    .catch(err => {
-                        console.error("Error refreshing events:", err);
-                    })
-                    .finally(() => {
-                        setLoading(false);
+                try {
+                    // Reload current page of events
+                    const response = await getEvents(page, eventsPerPage, {
+                        searchTerm,
+                        month: selectedMonth,
+                        year: selectedYear,
+                        sortBy
                     });
+
+                    if (response && Array.isArray(response.data)) {
+                        setSportsEvents(response.data);
+                        setLocalEvents(response.data);
+                        setHasMore(response.metadata?.hasNextPage || false);
+                    }
+                } catch (error) {
+                    console.error("Error syncing events:", error);
+                } finally {
+                    setLoading(false);
+                }
             }
         };
 
         networkStatus.addListener(handleSyncComplete);
         return () => networkStatus.removeListener(handleSyncComplete);
-    }, [page, eventsPerPage]);  // Add dependencies to access current page and eventsPerPage  // Empty dependency array to ensure it only runs once
+    }, [page, eventsPerPage, searchTerm, selectedMonth, selectedYear, sortBy]);
 
     console.log("Current sports events:", sportsEvents);
     console.log("Filtered and sorted events:", sortedEvents);

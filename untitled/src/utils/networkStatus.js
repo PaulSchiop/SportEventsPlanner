@@ -38,7 +38,10 @@ class NetworkStatus {
 
     checkServerStatus = async () => {
         try {
-            const response = await fetch('http://localhost:5000/entities/health-check', {
+            // Use window.location.hostname to dynamically get the current host
+            const baseUrl = `http://${window.location.hostname}:5000`;
+
+            const response = await fetch(`${baseUrl}/entities/health-check`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 cache: 'no-store'
@@ -46,6 +49,7 @@ class NetworkStatus {
 
             this.serverAvailable = response.ok;
         } catch (error) {
+            console.error("Server check failed:", error);
             this.serverAvailable = false;
         }
 
