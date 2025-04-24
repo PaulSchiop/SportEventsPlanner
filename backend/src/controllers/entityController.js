@@ -230,7 +230,7 @@ function generateEvents(count) {
     return events;
 }
 
-const events = generateEvents(1000);
+const events = generateEvents(1);
 console.log(JSON.stringify(events, null, 2));
 
 // Get all events with optional filtering, sorting, and pagination

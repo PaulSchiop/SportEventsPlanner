@@ -462,3 +462,43 @@
         font-size: 14px;
     }
 }
+
+/* Add to your Calendar.css */
+.generation-controls {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.control-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.start-button {
+    background-color: #4caf50;
+    color: white;
+}
+
+.stop-button {
+    background-color: #f44336;
+    color: white;
+}
+
+.control-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.generation-status {
+    margin-left: auto;
+    color: #666;
+    font-style: italic;
+}

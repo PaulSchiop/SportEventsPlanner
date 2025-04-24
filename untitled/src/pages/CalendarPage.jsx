@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
-import { getEvents, createEvent, updateEvent, deleteEvent } from '../services/apiService';
+import { getEvents, createEvent, updateEvent, deleteEvent,   initWebSocket,
+    removeWebSocketListener, startGenerationThread, stopGenerationThread  } from '../services/apiService';
 import '../styles/Calendar.css';
 import NetworkStatusBar from '../components/NetworkStatusBar';
 import EventModal from '../components/EventModal';
@@ -32,6 +33,10 @@ function CalendarPage() {
     const [hasMore, setHasMore] = useState(true);
     const lastEventRef = useRef();
     const observer = useRef();
+
+    //Generating thread
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generatedEvents, setGeneratedEvents] = useState([]);
 
     // Set up intersection observer for infinite scroll
     useEffect(() => {
@@ -105,6 +110,53 @@ function CalendarPage() {
             return () => clearTimeout(timer);
         }
     }, [loading, hasMore, events.length, page]);
+
+    // WebSocket connection
+    useEffect(() => {
+        const handleNewEvent = (updatedEvents) => {
+            // Check if this is a single event or array of events
+            const newEvent = Array.isArray(updatedEvents) ? updatedEvents[updatedEvents.length - 1] : updatedEvents;
+
+            // Add to generated events counter
+            setGeneratedEvents(prev => [...prev, newEvent]);
+
+            // Check if the new event matches current filters before adding to main list
+            const shouldAddToMainList = matchesCurrentFilters(newEvent);
+
+            if (shouldAddToMainList) {
+                setEvents(prev => [...prev, newEvent]);
+            }
+        };
+
+        // Helper function to check if event matches current filters
+        const matchesCurrentFilters = (event) => {
+            if (searchTerm && !event.title.toLowerCase().includes(searchTerm.toLowerCase())) {
+                return false;
+            }
+
+            if (selectedMonth || selectedYear) {
+                const eventDate = new Date(event.date);
+                const eventMonth = eventDate.getMonth() + 1;
+                const eventYear = eventDate.getFullYear();
+
+                if (selectedMonth && eventMonth !== parseInt(selectedMonth, 10)) {
+                    return false;
+                }
+
+                if (selectedYear && eventYear !== parseInt(selectedYear, 10)) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        initWebSocket(handleNewEvent);
+
+        return () => {
+            removeWebSocketListener(handleNewEvent);
+        };
+    }, [searchTerm, selectedMonth, selectedYear]);
 
     const fetchEvents = useCallback(async (pageNum = 1) => {
         setLoading(true);
@@ -259,6 +311,24 @@ function CalendarPage() {
         }
     };
 
+    const handleStartGeneration = async () => {
+        try {
+            await startGenerationThread();
+            setIsGenerating(true);
+        } catch (error) {
+            console.error('Error starting generation:', error);
+        }
+    };
+
+    const handleStopGeneration = async () => {
+        try {
+            await stopGenerationThread();
+            setIsGenerating(false);
+        } catch (error) {
+            console.error('Error stopping generation:', error);
+        }
+    };
+
     // Apply sorting
     const sortedEvents = [...events].sort((a, b) => {
         if (sortBy === 'title') return a.title.localeCompare(b.title);
@@ -286,6 +356,28 @@ function CalendarPage() {
                 sortBy={sortBy}
                 onSortChange={(e) => setSortBy(e.target.value)}
             />
+
+            <div className="generation-controls">
+                <button
+                    onClick={handleStartGeneration}
+                    disabled={isGenerating}
+                    className="control-button start-button"
+                >
+                    Start Auto-Generation
+                </button>
+                <button
+                    onClick={handleStopGeneration}
+                    disabled={!isGenerating}
+                    className="control-button stop-button"
+                >
+                    Stop Auto-Generation
+                </button>
+                {isGenerating && (
+                    <div className="generation-status">
+                        Generating events... {generatedEvents.length} created
+                    </div>
+                )}
+            </div>
 
             {error && <div className="error-message">{error}</div>}
 

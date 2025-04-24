@@ -6,6 +6,9 @@ const getApiUrl = () => {
 };
 
 const API_URL = getApiUrl();
+const THREAD_API_URL = `http://${window.location.hostname}:5000/api/thread`;
+let socket = null;
+let eventListeners = [];
 
 // Simplified data handling
 const updateLocalStorage = (newEvents, replaceMode = false) => {
@@ -137,7 +140,77 @@ export const deleteEvent = async (id) => {
     }
 };
 
-// Helper functions
+export const initWebSocket = (onMessage) => {
+    if (socket) return;
+
+    socket = new WebSocket(`ws://${window.location.hostname}:5000`);
+
+    socket.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            if (data.type === 'NEW_ENTITY') {
+                //const updatedEvents = updateLocalStorage([data.data]);
+                if (onMessage) {
+                    onMessage(data.data); // Pass just the new event data
+                }
+            }
+        } catch (error) {
+            console.error('Error processing WebSocket message:', error);
+        }
+    };
+
+    socket.onopen = () => {
+        console.log("WebSocket connection established");
+    };
+
+    socket.onclose = () => {
+        console.log("WebSocket connection closed");
+        socket = null;
+    };
+
+    socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    };
+
+    if (onMessage) {
+        eventListeners.push(onMessage);
+    }
+}
+
+export const removeWebSocketListener = (listener) => {
+    eventListeners = eventListeners.filter(cb => cb !== listener);
+};
+
+export const startGenerationThread = async () => {
+    try {
+        const response = await fetch(`${THREAD_API_URL}/start`, {
+            method: 'POST'
+        });
+        if(!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to start thread:', error);
+        throw error;
+    }
+};
+
+export const stopGenerationThread = async () => {
+    try {
+        const response = await fetch(`${THREAD_API_URL}/stop`, {
+            method: 'POST'
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to start thread: ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to stop thread:', error);
+        throw error;
+    }
+};
+
 const buildQueryParams = (page, limit, filters) => {
     const params = { page, limit };
 
