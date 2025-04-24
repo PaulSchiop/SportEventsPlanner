@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import Calendar from '../pages/Calendar';
+import CalendarPage from '../pages/CalendarPage.jsx';
 
 // Mock child components
 jest.mock('../components/EventCard', () => ({ event, onEdit, onDelete }) => (
@@ -65,13 +65,13 @@ beforeAll(() => {
     window.alert = jest.fn();
 });
 
-describe('Calendar Component', () => {
+describe('CalendarPage Component', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
     test('renders calendar with initial events', async () => {
-        render(<Calendar />);
+        render(<CalendarPage />);
 
         await waitFor(() => {
             expect(screen.getByTestId('event-list')).toHaveTextContent('2023 FIFA World Cup Final');
@@ -80,7 +80,7 @@ describe('Calendar Component', () => {
     });
 
     test('opens and closes the event modal', async () => {
-        render(<Calendar />);
+        render(<CalendarPage />);
         const user = userEvent.setup();
 
         // Open modal
@@ -94,7 +94,7 @@ describe('Calendar Component', () => {
 
     describe('Event Management', () => {
         test('successfully adds a new event', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
             const user = userEvent.setup();
 
             // Open the add event modal
@@ -121,7 +121,7 @@ describe('Calendar Component', () => {
         });
 
         test('edits an existing event', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
             const user = userEvent.setup();
 
             // Click edit on first event
@@ -142,7 +142,7 @@ describe('Calendar Component', () => {
         });
 
         test('deletes an event', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
             const user = userEvent.setup();
 
             // Find the event to delete
@@ -161,7 +161,7 @@ describe('Calendar Component', () => {
 
     describe('Form Validation', () => {
         test('shows error for empty form submission', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
             const user = userEvent.setup();
 
             await user.click(screen.getByText('+'));
@@ -171,7 +171,7 @@ describe('Calendar Component', () => {
         });
 
         test('validates time ranges', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
             const user = userEvent.setup();
 
             await user.click(screen.getByText('+'));
@@ -209,7 +209,7 @@ describe('Calendar Component', () => {
     describe('Filtering and Sorting', () => {
 // For the search term test:
         test('filters events by search term', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
 
             fireEvent.change(screen.getByTestId('search-input'), {
                 target: { value: 'FIFA World Cup' }
@@ -229,7 +229,7 @@ describe('Calendar Component', () => {
         });
 
         /*test('sorts events by title in alphabetical order', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
 
             // Change sort to title
             fireEvent.change(screen.getByTestId('sort-select'), {
@@ -255,7 +255,7 @@ describe('Calendar Component', () => {
 
     describe('Pagination', () => {
         test('paginates events correctly', async () => {
-            render(<Calendar />);
+            render(<CalendarPage />);
             const user = userEvent.setup();
 
             // Get initial events

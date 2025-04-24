@@ -2,8 +2,12 @@
     list-style-type: none;
     padding: 0;
     width: 100%;
+    overflow-y: auto;
+    height: calc(100vh - 300px);
+    scroll-behavior: smooth;
 }
 
+/* Event item styling */
 .event-item {
     background-color: #161616;
     margin: 10px 0;
@@ -37,6 +41,7 @@
     font-family: "Work Sans", sans-serif;
 }
 
+/* Event actions */
 .event-actions {
     position: absolute;
     top: 10px;
@@ -50,15 +55,16 @@
     border: none;
     cursor: pointer;
     font-size: 16px;
-    color: #666; /* Default icon color */
+    color: #666;
     padding: 5px;
     transition: ease color 250ms;
 }
 
 .edit-button:hover, .delete-button:hover {
-    color: #FF0080; /* Pink accent on hover */
+    color: #FF0080;
 }
 
+/* Filtering controls */
 .filter-container {
     display: flex;
     gap: 10px;
@@ -84,6 +90,7 @@
     font-family: "Work Sans", sans-serif;
 }
 
+/* Add event button */
 .add-event-button {
     background-color: #161616;
     color: #fff;
@@ -101,6 +108,7 @@
     background-color: #FF0080;
 }
 
+/* Modal styles */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -183,7 +191,7 @@
     background-color: #dc2b80;
 }
 
-/* Add to your existing Calendar.css */
+/* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
@@ -224,122 +232,226 @@
     background-color: #333;
 }
 
-/* Add these to make the pagination responsive */
-@media (max-width: 768px) {
-    .pagination {
-        flex-wrap: wrap;
+/* Loading states */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 0;
+}
+
+.loading-indicator p {
+    margin-top: 10px;
+    color: #999;
+}
+
+.bottom-loader {
+    padding: 20px 0;
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status messages */
+.no-events {
+    padding: 40px 0;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.end-of-list {
+    text-align: center;
+    padding: 20px 0;
+    color: #666;
+    font-style: italic;
+}
+
+.circular-notice {
+    text-align: center;
+    padding: 15px 0;
+    margin: 20px 0;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    color: #495057;
+    font-style: italic;
+    border-top: 2px solid #e9ecef;
+}
+
+/* Circular scrolling effects */
+.events-container {
+    position: relative;
+    min-height: 200px;
+}
+
+.circular-event {
+    opacity: 0.8;
+    animation: fadeInOut 2s infinite alternate;
+}
+
+@keyframes fadeInOut {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+}
+
+
+
+/* Calendar widget styles */
+.calendar-widget {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.react-calendar {
+    width: 100% !important;
+    max-width: 100% !important;
+    background-color: #161616;
+    color: #fff;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-family: "Work Sans", sans-serif;
+    box-sizing: border-box;
+    min-height: 500px;
+}
+
+/* Improved calendar button styles with more padding */
+.react-calendar button {
+    padding: 14px 10px;
+    margin: 2px;
+    font-size: 15px;
+}
+
+.react-calendar__navigation button {
+    color: #fff;
+    padding: 16px 10px;
+}
+
+.react-calendar__tile {
+    position: relative;
+    padding: 18px 10px;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.react-calendar__tile--active {
+    background-color: #FF0080;
+    color: white;
+    border-radius: 5px;
+}
+
+.react-calendar__tile:hover {
+    background-color: #333;
+}
+
+.react-calendar__tile abbr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.react-calendar__navigation {
+    margin-bottom: 10px;
+}
+
+.react-calendar__month-view__weekdays {
+    color: #FF0080;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 8px 0;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.react-calendar__month-view__days {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.event-marker {
+    width: 6px;
+    height: 6px;
+    background-color: #3498db;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Layout for left events list, right calendar */
+.calendar-layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.calendar-left-column {
+    grid-column: 1;
+    max-width: 400px;
+}
+
+.calendar-right-column {
+    grid-column: 2;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .calendar-layout {
+        grid-template-columns: 1fr;
     }
 
-    .pagination-button {
-        padding: 6px 12px;
+    .calendar-left-column, .calendar-right-column {
+        grid-column: 1;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .calendar-right-column {
+        grid-row: 2;
+    }
+
+    .calendar-left-column {
+        grid-row: 1;
+    }
+
+    .react-calendar {
+        min-height: 400px;
+    }
+
+    .event-list {
+        height: 400px;
+    }
+
+    .react-calendar button {
+        padding: 10px 6px;
         font-size: 14px;
     }
 }
 
-/* Add to your existing Calendar.css */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-    gap: 8px;
-}
-
-.pagination-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    background-color: #161616;
-    color: #fff;
-    font-family: "Work Sans", sans-serif;
-    cursor: pointer;
-    transition: all 250ms ease;
-    box-shadow: 0px 2px 2px #000000;
-}
-
-.pagination-button:hover:not(:disabled) {
-    background-color: #FF0080;
-    color: white;
-}
-
-.pagination-button.active {
-    background-color: #FF0080;
-    color: white;
-    font-family: "Work Sans Black";
-}
-
-.pagination-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: #222;
-}
-
-.pagination-button:not(.active):not(:disabled):hover {
-    background-color: #333;
-}
-
-.loading-spinner {
-    padding: 20px;
-    text-align: center;
-    color: #666;
-}
-
-.event-list {
-    overflow-y: auto;
-    height: calc(100vh - 200px); /* Adjust based on your layout */
-}
-   .event-list {
-       scroll-behavior: smooth;
-   }
-
-.loading-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    flex-direction: column;
-}
-
-   .event-list {
-       scroll-behavior: smooth;
-   }
-
-.loading-indicator {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    flex-direction: column;
-}
-
-.spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #3498db;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Add these to make the pagination responsive */
 @media (max-width: 768px) {
     .pagination {
         flex-wrap: wrap;

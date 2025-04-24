@@ -1,5 +1,5 @@
 import './App.css'
-import Calendar from './pages/Calendar'
+import CalendarPage from './pages/CalendarPage.jsx'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 
@@ -8,7 +8,7 @@ function App() {
   return (
       <Router>
         <Routes>
-          <Route path="/" element={< Calendar />} />
+          <Route path="/" element={< CalendarPage />} />
         </Routes>
       </Router>
   )

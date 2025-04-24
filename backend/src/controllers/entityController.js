@@ -250,7 +250,21 @@ exports.getAllEvents = (req, res) => {
         filteredEvents = filteredEvents.filter(event => event.group.toLowerCase() === req.query.group.toLowerCase());
     }
     if (req.query.date) {
-        filteredEvents = filteredEvents.filter(event => event.date === req.query.date);
+        const [year, month] = req.query.date.split('-'); // Extract year and month from query
+        filteredEvents = filteredEvents.filter(event => {
+            const eventDate = new Date(event.date);
+            return (
+                (month ? eventDate.getMonth() + 1 === parseInt(month, 10) : true) &&
+                (year ? eventDate.getFullYear() === parseInt(year, 10) : true)// Check month if provided
+            );
+        });
+    }
+    if (req.query.month) {
+        const month = parseInt(req.query.month, 10);
+        filteredEvents = filteredEvents.filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate.getMonth() + 1 === month; // Match month across all years
+        });
     }
 
     // Sorting (default: by date)

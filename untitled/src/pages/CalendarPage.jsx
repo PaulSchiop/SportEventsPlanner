@@ -1,0 +1,341 @@
+import React, {useState, useEffect, useRef, useCallback} from 'react';
+import { getEvents, createEvent, updateEvent, deleteEvent } from '../services/apiService';
+import '../styles/Calendar.css';
+import NetworkStatusBar from '../components/NetworkStatusBar';
+import EventModal from '../components/EventModal';
+import EventFilters from '../components/EventFilters';
+import EventsList from '../components/EventsList';
+import CalendarWidget from "../components/CalendarWidget.jsx";
+
+function CalendarPage() {
+    // State declarations
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [newEvent, setNewEvent] = useState({
+        title: '',
+        group: '',
+        date: '',
+        start_time: '',
+        end_time: '',
+        description: ''
+    });
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [isEditing, setIsEditing] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedMonth, setSelectedMonth] = useState('');
+    const [selectedYear, setSelectedYear] = useState('');
+    const [sortBy, setSortBy] = useState('date');
+    const [page, setPage] = useState(1);
+    const [eventsPerPage, setEventsPerPage] = useState(10);
+    const [hasMore, setHasMore] = useState(true);
+    const lastEventRef = useRef();
+    const observer = useRef();
+
+    // Set up intersection observer for infinite scroll
+    useEffect(() => {
+        if (loading) return;
+
+        if (observer.current) observer.current.disconnect();
+
+        const handleObserver = entries => {
+            const [entry] = entries;
+            if (entry.isIntersecting && hasMore) {
+                console.log("Last item visible, loading more...");
+                setPage(prevPage => prevPage + 1);
+            }
+        };
+
+        observer.current = new IntersectionObserver(handleObserver, {
+            root: null,
+            rootMargin: '0px 0px 200px 0px',
+            threshold: 0.1
+        });
+
+        if (lastEventRef.current) {
+            observer.current.observe(lastEventRef.current);
+        }
+
+        // Check if we need to load more items immediately (when initial data doesn't fill the screen)
+        if (lastEventRef.current && isElementInViewport(lastEventRef.current) && hasMore && !loading) {
+            console.log("Last item already visible on load, loading more items...");
+            setPage(prevPage => prevPage + 1);
+        }
+
+        return () => {
+            if (observer.current) observer.current.disconnect();
+        };
+    }, [loading, hasMore, events.length]);
+
+    const isElementInViewport = (el) => {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
+    };
+
+    // Load more events when page changes
+    useEffect(() => {
+        if (page > 1) {
+            loadMoreEvents();
+        }
+    }, [page]);
+
+    const resetToFirstPage = () => {
+        // Reset to first page and scroll to top
+        setPage(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Refetch first page events
+        fetchEvents(1).catch(err => console.error('Error fetching events:', err));
+    };
+
+// Add a useEffect to detect when we've reached the end
+    useEffect(() => {
+        if (!loading && !hasMore && events.length > 0 && page > 1) {
+            // Wait a bit to allow the user to see the "returning to beginning" message
+            const timer = setTimeout(() => {
+                resetToFirstPage();
+            }, 2000); // Wait 2 seconds before resetting
+
+            return () => clearTimeout(timer);
+        }
+    }, [loading, hasMore, events.length, page]);
+
+    const fetchEvents = useCallback(async (pageNum = 1) => {
+        setLoading(true);
+        console.log("Fetching events with filters: ", { searchTerm, selectedMonth, selectedYear, sortBy });
+        try {
+            const filters = {
+                searchTerm,
+                month: selectedMonth,
+                year: selectedYear,
+                sortBy
+            };
+            console.log("Filters: ", filters);
+            const response = await getEvents(pageNum, eventsPerPage, filters);
+            console.log("Fetched events: ", response.data);
+            setEvents(response.data);
+            setHasMore(response.metadata.hasNextPage);
+        } catch (err) {
+            setError('Failed to fetch events. Please try again later.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, [searchTerm, selectedMonth, selectedYear, sortBy, eventsPerPage]);
+
+    const loadMoreEvents = async () => {
+        if (!hasMore || loading) return;
+
+        setLoading(true);
+        try {
+            const filters = {
+                searchTerm,
+                month: selectedMonth,
+                year: selectedYear,
+                sortBy
+            };
+            const response = await getEvents(page, eventsPerPage, filters);
+            setEvents(prevEvents => [...prevEvents, ...response.data]);
+            setHasMore(response.metadata.hasNextPage);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Load events on initial render
+    useEffect(() => {
+        fetchEvents().catch(err => console.error('Error fetching events:', err));
+    }, [fetchEvents]);
+
+    // Filter events when search or filters change
+    useEffect(() => {
+        if (searchTerm || selectedMonth || selectedYear) {
+            setPage(1);
+            console.log("Filter applied");
+            fetchEvents(1).catch(err => console.error('Error fetching filtered events:', err));
+        }
+    }, [searchTerm, selectedMonth, selectedYear, sortBy, fetchEvents]);
+
+    const openModal = () => {
+        setIsEditing(false);
+        setNewEvent({
+            title: '',
+            group: '',
+            date: '',
+            start_time: '',
+            end_time: '',
+            description: ''
+        });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const openEditModal = (event) => {
+        setIsEditing(true);
+        setNewEvent(event);
+        setIsModalOpen(true);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewEvent(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const saveEvent = async () => {
+        try {
+            if (isEditing) {
+                await updateEvent(newEvent.ID, newEvent);
+                setEvents(prevEvents =>
+                    prevEvents.map(e => e.ID === newEvent.ID ? newEvent : e)
+                );
+            } else {
+                const createdEvent = await createEvent(newEvent);
+                setEvents(prevEvents => [...prevEvents, createdEvent]);
+            }
+            setIsModalOpen(false);
+        } catch (err) {
+            console.error('Error saving event:', err);
+        }
+    };
+
+    const removeEvent = async (id) => {
+        if (window.confirm('Are you sure you want to delete this event?')) {
+            try {
+                await deleteEvent(id);
+                setEvents(prevEvents => prevEvents.filter(event => event.ID !== id));
+            } catch (err) {
+                console.error('Error deleting event:', err);
+            }
+        }
+    };
+
+    const handleDateChange = async (date) => {
+        setSelectedDate(date);
+
+        // Format date as YYYY-MM-DD
+        const formattedDate = date.getFullYear() + '-' +
+            String(date.getMonth() + 1).padStart(2, '0') + '-' +
+            String(date.getDate()).padStart(2, '0');
+
+        // Update month/year filters
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        setSelectedMonth(month.toString());
+        setSelectedYear(year.toString());
+
+        setLoading(true);
+        try {
+            // Create a specific date filter
+            const filters = {
+                searchTerm,
+                date: formattedDate,
+                sortBy
+            };
+
+            // Reset page and fetch events with the date filter
+            setPage(1);
+            const response = await getEvents(1, eventsPerPage, filters);
+            setEvents(response.data);
+            setHasMore(response.metadata.hasNextPage);
+        } catch (err) {
+            setError('Failed to fetch events for the selected date.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Apply sorting
+    const sortedEvents = [...events].sort((a, b) => {
+        if (sortBy === 'title') return a.title.localeCompare(b.title);
+        if (sortBy === 'date') return new Date(a.date) - new Date(b.date);
+        return 0;
+    });
+
+    // Render function
+    return (
+        <div className="calendar-container">
+            <header className="calendar-header">
+                <h1>Calendar</h1>
+                <button onClick={openModal} className="add-event-button">+</button>
+            </header>
+
+            <NetworkStatusBar />
+
+            <EventFilters
+                searchTerm={searchTerm}
+                onSearchChange={(e) => setSearchTerm(e.target.value)}
+                selectedMonth={selectedMonth}
+                onMonthChange={(e) => setSelectedMonth(e.target.value)}
+                selectedYear={selectedYear}
+                onYearChange={(e) => setSelectedYear(e.target.value)}
+                sortBy={sortBy}
+                onSortChange={(e) => setSortBy(e.target.value)}
+            />
+
+            {error && <div className="error-message">{error}</div>}
+
+            <div className="calendar-layout">
+                <div className="calendar-left-column">
+                    <EventsList
+                        events={sortedEvents}
+                        loading={loading}
+                        hasMore={hasMore}
+                        lastEventRef={lastEventRef}
+                        onEdit={openEditModal}
+                        onDelete={removeEvent}
+                    />
+
+                    <div className="items-per-page">
+                        <label htmlFor="events-per-page">Items per load: </label>
+                        <select
+                            id="events-per-page"
+                            value={eventsPerPage}
+                            onChange={(e) => setEventsPerPage(Number(e.target.value))}
+                            className="items-select"
+                        >
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="calendar-right-column">
+                    <CalendarWidget
+                        events={events}
+                        onDateChange={handleDateChange}
+                        selectedDate={selectedDate}
+                    />
+                </div>
+            </div>
+
+
+            <EventModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                event={newEvent}
+                onChange={handleInputChange}
+                onSave={saveEvent}
+                isEditing={isEditing}
+            />
+        </div>
+    );
+}
+
+export default CalendarPage;

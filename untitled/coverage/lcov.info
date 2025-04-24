@@ -1,6 +1,6 @@
 TN:
-SF:src\pages\Calendar.jsx
-FN:7,Calendar
+SF:src\pages\CalendarPage.jsx
+FN:7,CalendarPage
 FN:225,(anonymous_1)
 FN:230,(anonymous_2)
 FN:244,(anonymous_3)
@@ -29,7 +29,7 @@ FN:428,(anonymous_25)
 FN:431,(anonymous_26)
 FNF:27
 FNH:19
-FNDA:71,Calendar
+FNDA:71,CalendarPage
 FNDA:10,(anonymous_1)
 FNDA:4,(anonymous_2)
 FNDA:1,(anonymous_3)

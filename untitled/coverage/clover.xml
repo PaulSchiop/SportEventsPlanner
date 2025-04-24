@@ -4,7 +4,7 @@
     <metrics statements="95" coveredstatements="86" conditionals="37" coveredconditionals="30" methods="30" coveredmethods="22" elements="162" coveredelements="138" complexity="0" loc="95" ncloc="95" packages="2" files="2" classes="2"/>
     <package name="pages">
       <metrics statements="83" coveredstatements="75" conditionals="31" coveredconditionals="25" methods="27" coveredmethods="19"/>
-      <file name="Calendar.jsx" path="C:\Users\schio\WebstormProjects\untitled\src\pages\Calendar.jsx">
+      <file name="CalendarPage.jsx" path="C:\Users\schio\WebstormProjects\untitled\src\pages\CalendarPage.jsx">
         <metrics statements="83" coveredstatements="75" conditionals="31" coveredconditionals="25" methods="27" coveredmethods="19"/>
         <line num="9" count="71" type="stmt"/>
         <line num="193" count="71" type="stmt"/>
