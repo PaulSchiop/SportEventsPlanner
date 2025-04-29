@@ -1,4 +1,5 @@
-import {offlineQueue} from "./offlineQueue.js";
+// src/utils/networkStatus.js
+import { offlineQueue } from "./offlineQueue.js";
 
 class NetworkStatus {
     constructor() {
@@ -9,24 +10,13 @@ class NetworkStatus {
         window.addEventListener('online', this.handleConnectionChange);
         window.addEventListener('offline', this.handleConnectionChange);
         this.checkServerStatus(); // Initial check
-        this.checkInterval = setInterval(this.checkServerStatus, 15000);
         this.initialize();
     }
 
     initialize = async () => {
         await this.checkServerStatus();
-        this.checkInterval = setInterval(async () => {
-            const previousStatus = this.serverAvailable;
-            await this.checkServerStatus();
-            // Only process queue if status changed from offline to online
-            if (this.isOnline && this.serverAvailable && !previousStatus) {
-                await offlineQueue.processQueue();
-                // Notification happens in checkServerStatus already, no need to call it again
-            }
-        }, 15000);
+        this.checkInterval = setInterval(this.checkServerStatus, 15000);
     };
-
-
 
     handleConnectionChange = () => {
         this.isOnline = navigator.onLine;
@@ -37,20 +27,24 @@ class NetworkStatus {
     };
 
     checkServerStatus = async () => {
+        const previousStatus = this.serverAvailable;
         try {
-            // Use window.location.hostname to dynamically get the current host
             const baseUrl = `http://${window.location.hostname}:5000`;
-
             const response = await fetch(`${baseUrl}/entities/health-check`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
                 cache: 'no-store'
             });
-
             this.serverAvailable = response.ok;
         } catch (error) {
             console.error("Server check failed:", error);
             this.serverAvailable = false;
+        }
+
+        // Trigger queue processing if server becomes available
+        if (this.isOnline && this.serverAvailable && !previousStatus) {
+            console.log("Server became available, processing queue...");
+            await offlineQueue.processQueue();
         }
 
         this.notifyListeners();

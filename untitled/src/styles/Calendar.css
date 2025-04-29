@@ -502,3 +502,21 @@
     color: #666;
     font-style: italic;
 }
+
+/* Add to your CSS file */
+.uploaded-video {
+    margin: 10px 0;
+}
+
+.uploaded-video video {
+    max-width: 100%;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.download-link {
+    display: inline-block;
+    margin-top: 5px;
+    color: #0066cc;
+    font-size: 0.9em;
+}

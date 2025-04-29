@@ -1,0 +1,200 @@
+[
+  {
+    "ID": 1,
+    "start_time": "19:00",
+    "end_time": "25:00",
+    "date": "2026-03-21",
+    "group": "Extreme Sports",
+    "title": "2024 Extreme Sports Grand Prix",
+    "description": "The biannual extreme sports event held at a world-famous venue."
+  },
+  {
+    "ID": 2,
+    "start_time": "12:00",
+    "end_time": "15:00",
+    "date": "2026-08-10",
+    "group": "Athletics",
+    "title": "2024 Athletics Tournament",
+    "description": "The biannual athletics event with intense competition."
+  },
+  {
+    "ID": 3,
+    "start_time": "07:00",
+    "end_time": "08:00",
+    "date": "2025-07-25",
+    "group": "Extreme Sports",
+    "title": "2024 Extreme Sports Classic",
+    "description": "The world-class extreme sports event that determines the world champion."
+  },
+  {
+    "ID": 4,
+    "start_time": "16:00",
+    "end_time": "19:00",
+    "date": "2026-04-14",
+    "group": "Surfing",
+    "title": "2024 Surfing Grand Prix",
+    "description": "The most prestigious surfing event featuring top competitors from around the world."
+  },
+  {
+    "ID": 5,
+    "start_time": "11:00",
+    "end_time": "16:00",
+    "date": "2027-02-25",
+    "group": "Golf",
+    "title": "2023 Golf Tournament",
+    "description": "The annual golf event held at a world-famous venue."
+  },
+  {
+    "ID": 6,
+    "start_time": "17:00",
+    "end_time": "20:00",
+    "date": "2026-05-02",
+    "group": "Formula 1",
+    "title": "2023 Formula 1 Championship",
+    "description": "The world-class formula 1 event with intense competition."
+  },
+  {
+    "ID": 7,
+    "start_time": "13:00",
+    "end_time": "16:00",
+    "date": "2026-04-26",
+    "group": "Football",
+    "title": "2025 Football Final",
+    "description": "The premier football event held at a world-famous venue."
+  },
+  {
+    "ID": 8,
+    "start_time": "18:00",
+    "end_time": "23:00",
+    "date": "2027-03-24",
+    "group": "Tennis",
+    "title": "2025 Tennis Final",
+    "description": "The world-class tennis event held at a world-famous venue."
+  },
+  {
+    "ID": 9,
+    "start_time": "15:00",
+    "end_time": "16:00",
+    "date": "2026-11-11",
+    "group": "Olympics",
+    "title": "2025 Olympics Cup",
+    "description": "The annual olympics event with intense competition."
+  },
+  {
+    "ID": 10,
+    "start_time": "09:00",
+    "end_time": "14:00",
+    "date": "2025-11-25",
+    "group": "Extreme Sports",
+    "title": "2023 Extreme Sports Final",
+    "description": "The annual extreme sports event held at a world-famous venue."
+  },
+  {
+    "ID": 11,
+    "start_time": "11:00",
+    "end_time": "16:00",
+    "date": "2025-10-07",
+    "group": "Volleyball",
+    "title": "2025 Volleyball Cup",
+    "description": "The premier volleyball event held at a world-famous venue."
+  },
+  {
+    "ID": 12,
+    "start_time": "13:00",
+    "end_time": "18:00",
+    "date": "2026-02-09",
+    "group": "Golf",
+    "title": "2024 Golf Championship",
+    "description": "The annual golf event held at a world-famous venue."
+  },
+  {
+    "ID": 13,
+    "start_time": "14:00",
+    "end_time": "18:00",
+    "date": "2026-04-27",
+    "group": "Football",
+    "title": "2023 Football Final",
+    "description": "The biannual football event featuring top competitors from around the world."
+  },
+  {
+    "ID": 14,
+    "start_time": "20:00",
+    "end_time": "26:00",
+    "date": "2026-12-12",
+    "group": "American Football",
+    "title": "2024 American Football Series",
+    "description": "The biannual american football event with intense competition."
+  },
+  {
+    "ID": 15,
+    "start_time": "14:00",
+    "end_time": "18:00",
+    "date": "2026-03-27",
+    "group": "Triathlon",
+    "title": "2023 Triathlon Tournament",
+    "description": "The most prestigious triathlon event with intense competition."
+  },
+  {
+    "ID": 16,
+    "start_time": "14:00",
+    "end_time": "18:00",
+    "date": "2026-01-14",
+    "group": "Surfing",
+    "title": "2024 Surfing Grand Prix",
+    "description": "The biannual surfing event featuring top competitors from around the world."
+  },
+  {
+    "ID": 17,
+    "start_time": "10:00",
+    "end_time": "11:00",
+    "date": "2026-11-30",
+    "group": "Swimming",
+    "title": "2023 Swimming Classic",
+    "description": "The annual swimming event featuring top competitors from around the world."
+  },
+  {
+    "ID": 18,
+    "start_time": "13:00",
+    "end_time": "18:00",
+    "date": "2025-07-13",
+    "group": "Formula 1",
+    "title": "2025 Formula 1 Classic",
+    "description": "The most prestigious formula 1 event held at a world-famous venue."
+  },
+  {
+    "ID": 19,
+    "start_time": "13:00",
+    "end_time": "18:00",
+    "date": "2025-08-14",
+    "group": "Cycling",
+    "title": "2024 Cycling Tournament",
+    "description": "The annual cycling event with intense competition."
+  },
+  {
+    "ID": 20,
+    "start_time": "20:00",
+    "end_time": "26:00",
+    "date": "2027-04-03",
+    "group": "Tennis",
+    "title": "2025 Tennis Cup",
+    "description": "The world-class tennis event with intense competition."
+  },
+  {
+    "ID": 21,
+    "title": "asdasd test",
+    "group": "Football",
+    "date": "2025-04-29",
+    "start_time": "12:58",
+    "end_time": "17:58",
+    "description": "this is a test to see if it syncs"
+  },
+  {
+    "ID": 22,
+    "title": "asd",
+    "group": "test",
+    "date": "2025-04-29",
+    "start_time": "13:40",
+    "end_time": "18:40",
+    "description": "testedhads"
+  }
+]

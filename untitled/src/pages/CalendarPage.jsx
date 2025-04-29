@@ -7,6 +7,26 @@ import EventModal from '../components/EventModal';
 import EventFilters from '../components/EventFilters';
 import EventsList from '../components/EventsList';
 import CalendarWidget from "../components/CalendarWidget.jsx";
+import FileUpload from '../components/FileUpload';
+import '../styles/FileUpload.css';
+import {getFileUrl} from "../services/fileService.jsx";
+
+// Add this function to your fileService.jsx and import it here
+const getUploadedFiles = async () => {
+    try {
+        const response = await fetch(`http://${window.location.hostname}:5000/api/files`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch files: ${response.statusText}`);
+        }
+
+        const files = await response.json();
+        return files;
+    } catch (error) {
+        console.error("Error fetching files:", error);
+        throw error;
+    }
+};
 
 function CalendarPage() {
     // State declarations
@@ -31,12 +51,48 @@ function CalendarPage() {
     const [page, setPage] = useState(1);
     const [eventsPerPage, setEventsPerPage] = useState(10);
     const [hasMore, setHasMore] = useState(true);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+    const [isLoadingFiles, setIsLoadingFiles] = useState(false);
     const lastEventRef = useRef();
     const observer = useRef();
 
     //Generating thread
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedEvents, setGeneratedEvents] = useState([]);
+
+    // Auto-fetch uploaded files on component mount
+    useEffect(() => {
+        const fetchUploadedFiles = async () => {
+            setIsLoadingFiles(true);
+            try {
+                const files = await getUploadedFiles();
+                console.log("Fetched files from server:", files);
+
+                // Enhance file objects with mimetype guess based on extension
+                const enhancedFiles = files.map(file => {
+                    const extension = file.filename.split('.').pop().toLowerCase();
+                    const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'wmv', 'flv'];
+
+                    return {
+                        ...file,
+                        // Add mimetype if it doesn't exist
+                        mimetype: file.mimetype || (videoExtensions.includes(extension) ? 'video/mp4' : 'application/octet-stream'),
+                        // Add originalname if it doesn't exist
+                        originalname: file.originalname || file.filename
+                    };
+                });
+
+                setUploadedFiles(enhancedFiles);
+            } catch (error) {
+                console.error("Failed to fetch uploaded files:", error);
+                // Optionally set an error state here
+            } finally {
+                setIsLoadingFiles(false);
+            }
+        };
+
+        fetchUploadedFiles();
+    }, []); // Empty dependency array means this runs once on component mount
 
     // Set up intersection observer for infinite scroll
     useEffect(() => {
@@ -329,6 +385,33 @@ function CalendarPage() {
         }
     };
 
+    // Function to refresh the list of uploaded files
+    const refreshUploadedFiles = async () => {
+        setIsLoadingFiles(true);
+        try {
+            const files = await getUploadedFiles();
+            // Enhance file objects with mimetype based on extension
+            const enhancedFiles = files.map(file => {
+                const extension = file.filename.split('.').pop().toLowerCase();
+                const videoExtensions = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'wmv', 'flv'];
+
+                return {
+                    ...file,
+                    // Add mimetype if it doesn't exist
+                    mimetype: file.mimetype || (videoExtensions.includes(extension) ? 'video/mp4' : 'application/octet-stream'),
+                    // Add originalname if it doesn't exist
+                    originalname: file.originalname || file.filename
+                };
+            });
+
+            setUploadedFiles(enhancedFiles);
+        } catch (error) {
+            console.error("Failed to refresh uploaded files:", error);
+        } finally {
+            setIsLoadingFiles(false);
+        }
+    };
+
     // Apply sorting
     const sortedEvents = [...events].sort((a, b) => {
         if (sortBy === 'title') return a.title.localeCompare(b.title);
@@ -426,6 +509,67 @@ function CalendarPage() {
                 onSave={saveEvent}
                 isEditing={isEditing}
             />
+
+            <div className="file-upload-section">
+                <h3>Upload Video Attachment</h3>
+                <div className="file-actions">
+                    <FileUpload
+                        onUploadSuccess={(fileInfo) => {
+                            console.log("Upload success, file info:", fileInfo);
+                            setUploadedFiles(prev => [...prev, fileInfo]);
+                        }}
+                        onUploadError={(error) => {
+                            console.error("Upload failed:", error);
+                        }}
+                    />
+                    <button
+                        className="refresh-button"
+                        onClick={refreshUploadedFiles}
+                        disabled={isLoadingFiles}
+                    >
+                        {isLoadingFiles ? "Loading..." : "Refresh Files"}
+                    </button>
+                </div>
+
+                {isLoadingFiles && <div className="loading-message">Loading files...</div>}
+
+                {uploadedFiles.length > 0 && (
+                    <div className="uploaded-files">
+                        <h4>Uploaded Videos:</h4>
+                        <ul className="files-list">
+                            {uploadedFiles.map((file, index) => (
+                                <li key={index} className="file-item">
+                                    {file && file.mimetype && file.mimetype.startsWith("video/") ? (
+                                        <div className="uploaded-video">
+                                            <video controls width="300" src={getFileUrl(file.filename)} />
+                                            <div className="file-info">
+                                                <strong>{file.originalname || file.filename}</strong>
+                                                <a
+                                                    href={getFileUrl(file.filename)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="download-link"
+                                                >
+                                                    Download
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <a href={getFileUrl(file.filename)} target="_blank" rel="noopener noreferrer">
+                                            {file.originalname || file.filename}
+                                        </a>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {!isLoadingFiles && uploadedFiles.length === 0 && (
+                    <div className="no-files-message">No files uploaded yet.</div>
+                )}
+            </div>
+
         </div>
     );
 }
