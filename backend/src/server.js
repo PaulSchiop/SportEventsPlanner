@@ -3,6 +3,9 @@ const cors = require("cors");
 const http = require("http"); // Required for WebSocket+Express integration
 const { WebSocketServer, WebSocket } = require("ws");
 const entityRoutes = require("./routes/entityRoutes");
+const fileRoutes = require("./routes/fileRoutes");
+const path = require("path");
+const uploadsDir = path.join(__dirname, "uploads");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -10,6 +13,7 @@ const corsOptions = {
     origin: "*", // Allow connections from any origin
     credentials: true, // Include if you need cookies/auth
 };
+
 
 // Middleware
 app.use(express.json());
@@ -35,6 +39,9 @@ const threadRoutes = require("./routes/threadRoutes")(wss);
 // Routes
 app.use("/entities", entityRoutes);
 app.use("/api/thread", threadRoutes);
+app.use("/api", fileRoutes);
+
+app.use('/api/files', express.static(uploadsDir));
 
 wss.broadcast = (data) => {
     console.log(`Broadcasting to ${wss.clients.size} clients:`, data);
